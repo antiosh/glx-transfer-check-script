@@ -1,0 +1,46 @@
+{
+    "parserOptions": {
+      "ecmaVersion": 13
+    },
+    "env": {
+      "node": true
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "prefer-const": "error",
+      "no-console": "off",
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ],
+      "no-unused-vars": [
+        "warn"
+      ],
+      "curly": [
+        "error",
+        "all"
+      ],
+      "arrow-parens": [
+        "error",
+        "always"
+      ],
+      "max-statements-per-line": [
+        "error",
+        {
+          "max": 1
+        }
+      ],
+      "function-paren-newline": [
+        "error",
+        "consistent"
+      ],
+      "space-in-parens": [
+        "error",
+        "never"
+      ]
+    }
+  }
