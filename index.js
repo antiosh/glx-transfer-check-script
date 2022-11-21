@@ -50,6 +50,7 @@ async function processBlocks() {
   let currentBlock = START_BLOCK;
   while (currentBlock <= END_BLOCK) {
     await processBlock(currentBlock);
+    console.log('PROCESSED BLOCK:', currentBlock);
     currentBlock++;
   }
 }
@@ -145,7 +146,7 @@ async function processOperation(
         if (userTransfersMap[`${account}-${amount}`]) {
           const transfers = userTransfersMap[`${account}-${amount}`];
           for (let i = 0; i < transfers.length; i++) {
-            const transfer = userTransfersMap[i];
+            const transfer = transfers[i];
             if (!transfer.handled) {
               transfer.handled = true;
               console.log(`Handled ${account} ${amount} GLX`);
