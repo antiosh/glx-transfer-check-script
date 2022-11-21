@@ -24,14 +24,15 @@ async function getValidatorTransaction(transactionId) {
   }
 }
 
-const allUserTransfers = [];
-const allGlsHiveEngineTransfers = [];
+let allUserTransfers = [];
+let allGlsHiveEngineTransfers = [];
 
-const userTransfersMap = {};
+let userTransfersMap = {};
 
 // https://hiveblocks.com/b/69802648
 // 2022-11-19T16:00:00
 const START_BLOCK = 69802648;
+let LAST_BLOCK = START_BLOCK - 1;
 
 // https://hiveblocks.com/b/69812239
 // 2022-11-20T00:00:00
@@ -46,11 +47,23 @@ const END_BLOCK = 69812239;
 // JUST FOR TESTING
 // const END_BLOCK = START_BLOCK + 1;
 
-async function processBlocks() {
-  let currentBlock = START_BLOCK;
+async function start() {
+  if (fs.existsSync('state.json')) {
+		const state = JSON.parse(fs.readFileSync('state.json'));
+    LAST_BLOCK = state?.last_block || LAST_BLOCK;
+    allUserTransfers = state?.allUserTransfers || allUserTransfers;
+    allGlsHiveEngineTransfers = state?.allGlsHiveEngineTransfers || allGlsHiveEngineTransfers;
+    userTransfersMap = state?.userTransfersMap || userTransfersMap;
+	}
+  await processBlocks(LAST_BLOCK + 1);
+}
+
+async function processBlocks(startBlock) {
+  let currentBlock = startBlock || START_BLOCK;
   while (currentBlock <= END_BLOCK) {
     await processBlock(currentBlock);
     console.log('PROCESSED BLOCK:', currentBlock);
+    LAST_BLOCK = currentBlock;
     currentBlock++;
   }
 }
@@ -186,7 +199,7 @@ function writeCsv(fileName, data) {
   });
 }
 
-processBlocks().then(() => {
+start().then(() => {
   const dateString = dayjs().format('YYYY-MM-DD_HH_MM');
   const userTransfersFileName = `${dateString}_user_transfers.csv`;
   const glsHiveEngineTransfersFileName = `${dateString}_gls_hive_engine_transfers.csv`;
@@ -198,4 +211,10 @@ processBlocks().then(() => {
   console.log('FINISHED!');
 }).catch((err) => {
   console.log('ERROR PROCESSING', err);
+  fs.writeFile('state.json', JSON.stringify({
+    last_block: LAST_BLOCK,
+    allUserTransfers,
+    allGlsHiveEngineTransfers,
+    userTransfersMap,
+  }), function () {});
 });
